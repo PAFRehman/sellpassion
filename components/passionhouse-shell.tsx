@@ -3,7 +3,7 @@
 import * as React from "react";
 import {
   Bell, CircleDollarSign, FileText, Handshake, Inbox, LayoutGrid, LogOut, Menu,
-  Plus, Radio, RefreshCcw, ShieldCheck, UserSearch, UserRound, Users, X,
+  Moon, Plus, Radio, RefreshCcw, ShieldCheck, Sun, UserSearch, UserRound, Users, X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -63,6 +63,7 @@ export function PassionHouseApp() {
   const [fundingIdeaId, setFundingIdeaId] = React.useState<string | null>(null);
   const [tipTarget, setTipTarget] = React.useState<{ userId: string; ideaId?: string; kind?: "tip" | "backing" } | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
+  const [theme, setTheme] = React.useState<"dark" | "light">("dark");
   const stateRef = React.useRef(state);
 
   React.useEffect(() => {
@@ -70,6 +71,15 @@ export function PassionHouseApp() {
     setState(loaded);
     stateRef.current = loaded;
     setHydrated(true);
+    // Load saved theme
+    const savedTheme = localStorage.getItem("ph-theme") as "dark" | "light" | null;
+    if (savedTheme) {
+      setTheme(savedTheme);
+      if (savedTheme === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      }
+    }
   }, []);
 
   React.useEffect(() => {
@@ -707,8 +717,23 @@ export function PassionHouseApp() {
     { key: "profile", icon: UserRound },
   ];
 
+  function toggleTheme() {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("ph-theme", next);
+      if (next === "light") {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+      } else {
+        document.documentElement.classList.remove("light");
+        document.documentElement.classList.add("dark");
+      }
+      return next;
+    });
+  }
+
   return (
-    <div className="min-h-svh bg-black text-white">
+    <div className="min-h-svh">
       <AmbientCursor />
       <div className="ph-atmosphere" aria-hidden="true">
         <div className="ph-orbit ph-orbit-one" />
@@ -754,6 +779,14 @@ export function PassionHouseApp() {
             <Plus />
             Create post
           </Button>
+          <button
+            type="button"
+            className="ph-theme-toggle"
+            onClick={toggleTheme}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? <Sun /> : <Moon />}
+          </button>
           <Button type="button" variant="ghost" size="icon-sm" className="text-white/55 hover:bg-white/10 hover:text-white">
             <Bell />
             <span className="sr-only">Notifications</span>

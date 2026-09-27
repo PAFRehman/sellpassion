@@ -251,6 +251,14 @@ export function IdeaDetailSheet({
   onOpenProfile: (userId: string) => void;
 }) {
   const [comment, setComment] = React.useState("");
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    if (idea && scrollRef.current) {
+      scrollRef.current.scrollTop = 0;
+    }
+  }, [idea?.id]);
+
   if (!idea || !creator) return <Dialog open={false} />;
 
   const reaction = currentUser ? state.reactions[idea.id + ":" + currentUser.id] : undefined;
@@ -284,7 +292,7 @@ export function IdeaDetailSheet({
           </div>
         </header>
 
-        <div className="ph-reader-scroll">
+        <div className="ph-reader-scroll" ref={scrollRef}>
           <main className="ph-reader-layout">
             <article className="ph-reader-article">
               <div className="ph-reader-meta"><ContentBadge idea={idea} /><span>{idea.category}</span><span>{idea.postType === "post" ? "1 min" : idea.readingTime + " min read"}</span>{idea.postType === "idea" && <span>{accessModeLabel(idea)}</span>}</div>
