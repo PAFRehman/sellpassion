@@ -16,8 +16,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { AccessRequestDialog, PostIdeaDialog, ProposalDialog, type AccessSubmission, type PostSubmission } from "@/components/passionhouse/composer-dialogs";
 import { DealsView, ProposalsView, RequestsView } from "@/components/passionhouse/collaboration-views";
 import { DiscoverView, IdeaDetailSheet } from "@/components/passionhouse/discovery";
-import { FundingPitchDialog, FundingView } from "@/components/passionhouse/funding";
+import { FundingPitchDialog, FundingView, type FundingSubmission } from "@/components/passionhouse/funding";
 import { AuthDialog, PeopleView, ProfileView, PublicProfileSheet } from "@/components/passionhouse/people-views";
+import { TipDialog, type TipSubmission } from "@/components/passionhouse/support-dialogs";
 import {
   AmbientCursor, Brand, FloatingPostButton, ScoreRing, TIER_LABELS, UserAvatar, VIEW_LABELS,
   hashPassword, stateId,
@@ -60,6 +61,7 @@ export function PassionHouseApp() {
   const [requestIdeaId, setRequestIdeaId] = React.useState<string | null>(null);
   const [proposalIdeaId, setProposalIdeaId] = React.useState<string | null>(null);
   const [fundingIdeaId, setFundingIdeaId] = React.useState<string | null>(null);
+  const [tipTarget, setTipTarget] = React.useState<{ userId: string; ideaId?: string; kind?: "tip" | "backing" } | null>(null);
   const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const stateRef = React.useRef(state);
 
@@ -137,6 +139,8 @@ export function PassionHouseApp() {
   const requestIdea = state.ideas.find((idea) => idea.id === requestIdeaId) ?? null;
   const proposalIdea = state.ideas.find((idea) => idea.id === proposalIdeaId) ?? null;
   const fundingIdea = state.ideas.find((idea) => idea.id === fundingIdeaId) ?? null;
+  const tipRecipient = state.users.find((user) => user.id === tipTarget?.userId) ?? null;
+  const tipIdea = state.ideas.find((idea) => idea.id === tipTarget?.ideaId) ?? null;
   const selectedDeal = state.dealRooms.find((deal) => deal.id === selectedDealId) ?? state.dealRooms[0] ?? null;
 
   const usersById = React.useMemo(
@@ -252,6 +256,45 @@ export function PassionHouseApp() {
     toast.success("Comment added");
   }
 
+  function openTip(userId: string, ideaId?: string, kind: "tip" | "backing" = "tip") {
+    if (!requireUser() || !state.currentUserId) return;
+    if (userId === state.currentUserId) {
+      toast.info("Choose another creator or builder to support in this demo.");
+      return;
+    }
+    setTipTarget({ userId, ideaId, kind });
+  }
+
+  function submitTip(recipient: UserProfile, idea: Idea | null, input: TipSubmission) {
+    if (!state.currentUserId) return;
+    setState((previous) => ({
+      ...previous,
+      tips: [
+        {
+          id: stateId("tip"),
+          fromUserId: previous.currentUserId as string,
+          toUserId: recipient.id,
+          ideaId: idea?.id,
+          amount: input.amount,
+          note: input.note,
+          kind: input.kind,
+          createdAt: new Date().toISOString(),
+        },
+        ...previous.tips,
+      ],
+      ideas: idea
+        ? previous.ideas.map((item) => item.id === idea.id ? {
+            ...item,
+            tipsTotal: item.tipsTotal + input.amount,
+            tipCount: item.tipCount + 1,
+            backerCount: item.backerCount + (input.kind === "backing" ? 1 : 0),
+          } : item)
+        : previous.ideas,
+    }));
+    setTipTarget(null);
+    toast.success(input.kind === "backing" ? `You backed ${idea?.title ?? recipient.name} with $${input.amount}` : `$${input.amount} demo tip sent to ${recipient.name}`);
+  }
+
   function submitAccessRequest(idea: Idea, input: AccessSubmission) {
     if (!requireUser() || !state.currentUserId) return;
     const existing = state.accessRequests.find(
@@ -288,7 +331,13 @@ export function PassionHouseApp() {
       };
     });
     setRequestIdeaId(null);
-    toast.success(input.method === "paid" ? TIER_LABELS[input.tier] + " unlocked through demo checkout" : "Full Project unlocked — MVP auto-approval from " + usersById[idea.creatorId].name);
+    toast.success(
+      input.method === "paid"
+        ? TIER_LABELS[input.tier] + " unlocked through demo checkout"
+        : input.method === "trust"
+          ? "Builder Kit unlocked through your credibility"
+          : "Execution Room unlocked — MVP auto-approval from " + usersById[idea.creatorId].name,
+    );
   }
 
   function resolveRequest(requestId: string, status: "approved" | "declined", grantedTier?: AccessTier) {
@@ -437,23 +486,41 @@ export function PassionHouseApp() {
     if (!requireUser() || !state.currentUserId) return;
     const ideaId = stateId(input.postType);
     const isQuickPost = input.postType === "post";
-    const disclosure = isQuickPost ? "open" : input.disclosure;
+    const isArticle = input.postType === "article";
+    const isIdea = input.postType === "idea";
+    const disclosure = isIdea ? input.disclosure : "open";
+    const completeCopy = input.fullDetails.trim() || input.description.trim();
+    const readingTime = isQuickPost ? 1 : Math.max(3, Math.ceil((input.description + " " + completeCopy).split(/\s+/).length / 180));
+    const sections: Idea["sections"] = isQuickPost
+      ? []
+      : isArticle
+        ? [
+            { id: ideaId + "-article", label: "Article", title: input.oneLiner.trim(), body: completeCopy, access: "public" },
+            { id: ideaId + "-takeaway", label: "Takeaway", title: "What to carry forward", body: input.description.trim(), access: "public" },
+          ]
+        : [
+            { id: ideaId + "-public", label: "The opportunity", title: "Why this idea should exist", body: input.description.trim(), access: "public" },
+            { id: ideaId + "-build", label: "Builder Kit", title: "How it could work", body: completeCopy, access: input.accessMode === "public" ? "public" : "build" },
+            { id: ideaId + "-full", label: "Execution Room", title: "The first path from idea to project", body: "Turn the strongest assumption into one test, recruit the smallest useful team and publish what the first milestone proves. Add the commercial plan, risks and protected materials here as the idea develops.", access: input.accessMode === "public" ? "public" : "full", bullets: ["Define the riskiest assumption", "Choose one measurable milestone", "Invite the first complementary builder"] },
+          ];
     const idea: Idea = {
       id: ideaId,
       creatorId: state.currentUserId,
       title: input.title.trim(),
       oneLiner: input.oneLiner.trim(),
       description: input.description.trim(),
-      fullDetails: input.fullDetails.trim() || input.description.trim(),
+      fullDetails: completeCopy,
       postType: input.postType,
       disclosure,
+      accessMode: isIdea ? input.accessMode : "public",
+      trustThreshold: isIdea ? input.trustThreshold : 0,
       category: input.category,
       stage: input.stage,
       createdAt: new Date().toISOString(),
-      signal: isQuickPost ? 62 : 68,
-      tags: isQuickPost ? [input.category, "Quick post"] : [input.category, input.stage],
+      signal: isQuickPost ? 62 : isArticle ? 66 : 68,
+      tags: isQuickPost ? [input.category, "Quick post"] : isArticle ? [input.category, "Article"] : [input.category, input.stage],
       asks: input.ask.trim() ? [input.ask.trim()] : [],
-      validation: isQuickPost
+      validation: !isIdea
         ? []
         : [
             { label: "Evidence", value: input.evidence.trim() ? "Added" : "Open", detail: input.evidence.trim() || "Add proof later" },
@@ -474,34 +541,25 @@ export function PassionHouseApp() {
         full: "Execution plan, commercial detail and private materials.",
       },
       accessPricing: { currency: "USD", context: 0, build: 19, full: 49 },
+      readingTime,
+      sections,
+      buildNeeds: input.ask.trim() ? [{ role: input.ask.trim(), contribution: "Help turn the strongest assumption into a working test.", commitment: "Start with one focused sprint" }] : [],
+      tipsTotal: 0,
+      tipCount: 0,
+      backerCount: 0,
+      progress: isIdea ? 8 : 100,
     };
 
-    setState((previous) => {
-      const fundingRequest: FundingRequest | null = input.funding
-        ? {
-            id: stateId("funding"),
-            ideaId,
-            userId: previous.currentUserId as string,
-            ...input.funding,
-            status: "under-review",
-            createdAt: new Date().toISOString(),
-          }
-        : null;
-      return {
-        ...previous,
-        ideas: [idea, ...previous.ideas],
-        fundingRequests: fundingRequest ? [fundingRequest, ...previous.fundingRequests] : previous.fundingRequests,
-      };
-    });
+    setState((previous) => ({ ...previous, ideas: [idea, ...previous.ideas] }));
     setPostOpen(false);
     setView("discover");
     setSelectedIdeaId(idea.id);
-    toast.success(isQuickPost ? "Post published to Discover" : input.funding ? "Idea published and funding pitch submitted" : "Idea published to Discover");
+    toast.success(isQuickPost ? "Post published" : isArticle ? "Article published" : "Idea published — add funding whenever the milestone is clear");
   }
 
   function submitFundingPitch(
     idea: Idea,
-    input: Pick<FundingRequest, "audience" | "amount" | "summary" | "useOfFunds">,
+    input: FundingSubmission,
   ) {
     if (!requireUser() || !state.currentUserId) return;
     if (idea.creatorId !== state.currentUserId) {
@@ -516,6 +574,8 @@ export function PassionHouseApp() {
           ideaId: idea.id,
           userId: previous.currentUserId as string,
           ...input,
+          raisedAmount: 0,
+          backerCount: 0,
           status: "under-review",
           createdAt: new Date().toISOString(),
         },
@@ -525,7 +585,7 @@ export function PassionHouseApp() {
     setFundingIdeaId(null);
     setSelectedIdeaId(null);
     setView("funding");
-    toast.success("Funding pitch submitted for investor and project review");
+    toast.success(input.fundingType === "milestone" ? "Milestone backing page published" : input.fundingType === "grant" ? "PassionHouse grant ask submitted" : "Investor funding ask published");
   }
 
   async function createAccount(name: string, email: string, password: string, title: string) {
@@ -809,6 +869,7 @@ export function PassionHouseApp() {
               onPost={() => setPostOpen(true)}
               onReaction={toggleReaction}
               onInterest={toggleInterest}
+              onTip={(ideaId, userId, kind) => openTip(userId, ideaId, kind)}
               onOpenProfile={openProfile}
             />
           )}
@@ -820,6 +881,7 @@ export function PassionHouseApp() {
               currentUserId={state.currentUserId}
               onOpenIdea={setSelectedIdeaId}
               onPitch={setFundingIdeaId}
+              onBack={(ideaId, userId) => openTip(userId, ideaId, "backing")}
             />
           )}
           {view === "people" && (
@@ -828,6 +890,7 @@ export function PassionHouseApp() {
               ideas={state.ideas}
               currentUserId={state.currentUserId}
               onOpenProfile={openProfile}
+              onTip={(userId) => openTip(userId)}
             />
           )}
           {view === "requests" && (
@@ -898,6 +961,7 @@ export function PassionHouseApp() {
             setFundingIdeaId(ideaId);
           }
         }}
+        onTip={(ideaId, userId, kind) => openTip(userId, ideaId, kind)}
         onOpenProfile={(userId) => {
           setSelectedIdeaId(null);
           openProfile(userId);
@@ -911,15 +975,18 @@ export function PassionHouseApp() {
           setSelectedProfileId(null);
           setSelectedIdeaId(ideaId);
         }}
+        onTip={(userId) => openTip(userId)}
       />
       <AccessRequestDialog
         idea={requestIdea}
         creator={requestIdea ? usersById[requestIdea.creatorId] : null}
+        currentUser={currentUser}
         onClose={() => setRequestIdeaId(null)}
         onSubmit={submitAccessRequest}
       />
       <ProposalDialog idea={proposalIdea} onClose={() => setProposalIdeaId(null)} onSubmit={submitProposal} />
       <FundingPitchDialog idea={fundingIdea} onClose={() => setFundingIdeaId(null)} onSubmit={submitFundingPitch} />
+      <TipDialog recipient={tipRecipient} idea={tipIdea} initialKind={tipTarget?.kind} onClose={() => setTipTarget(null)} onSubmit={submitTip} />
       <PostIdeaDialog open={postOpen} onClose={() => setPostOpen(false)} onSubmit={postIdea} />
       <AuthDialog
         open={authOpen || !currentUser}

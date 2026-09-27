@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "PassionHouse — Find the people who move ideas",
+  title: "PassionHouse — Where ideas find builders",
   description:
-    "The public idea network where credible people find each other, earn access and turn conviction into execution.",
+    "Share an idea, find credible builders, reward useful work and fund the next step toward making it real.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",

@@ -20,8 +20,8 @@ import { cn } from "@/lib/utils";
 
 export const TIER_LABELS: Record<AccessTier, string> = {
   context: "Context",
-  build: "Build brief",
-  full: "Full idea",
+  build: "Builder kit",
+  full: "Execution room",
 };
 
 export const VIEW_LABELS: Record<ViewKey, string> = {
@@ -74,6 +74,7 @@ export function socialIcon(platform: SocialPlatform, className = "size-4") {
 }
 
 export function fundingAudienceLabel(audience: FundingAudience) {
+  if (audience === "community") return "Community backing";
   if (audience === "passionhouse") return "PassionHouse Fund";
   if (audience === "investors") return "Investor network";
   return "Investors + PassionHouse";

@@ -3,8 +3,8 @@
 import * as React from "react";
 import NextImage from "next/image";
 import {
-  CheckCircle2, ChevronRight, CircleDollarSign, CreditCard, Globe2,
-  Image as ImageIcon, KeyRound, Lightbulb, Lock, MessageCircle, Rocket, Send, Video, X,
+  BookOpen, CheckCircle2, ChevronRight, CreditCard, Globe2,
+  Image as ImageIcon, KeyRound, Lightbulb, Lock, MessageCircle, Rocket, Send, ShieldCheck, Video, X,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import type { AccessTier, FundingAudience, Idea, MediaAttachment, Proposal, UserProfile } from "@/lib/passionhouse-types";
+import type { AccessMode, AccessTier, ContentType, Idea, MediaAttachment, Proposal, UserProfile } from "@/lib/passionhouse-types";
 import { cn } from "@/lib/utils";
 import {
   CATEGORIES, STAGES, TIER_LABELS, FormField, readFileAsDataUrl, stateId,
@@ -24,22 +24,24 @@ export type AccessSubmission = {
   tier: AccessTier;
   role: string;
   note: string;
-  method: "request" | "paid";
+  method: "request" | "paid" | "trust";
   amountPaid?: string;
 };
 
 export function AccessRequestDialog({
   idea,
   creator,
+  currentUser,
   onClose,
   onSubmit,
 }: {
   idea: Idea | null;
   creator: UserProfile | null;
+  currentUser: UserProfile | null;
   onClose: () => void;
   onSubmit: (idea: Idea, input: AccessSubmission) => void;
 }) {
-  const [path, setPath] = React.useState<"request" | "pay">("request");
+  const [path, setPath] = React.useState<"request" | "pay" | "trust">("request");
   const [tier, setTier] = React.useState<AccessTier>("build");
   const [role, setRole] = React.useState("");
   const [note, setNote] = React.useState("");
@@ -48,7 +50,7 @@ export function AccessRequestDialog({
 
   React.useEffect(() => {
     if (!idea) return;
-    setPath("request");
+    setPath(idea.accessMode === "paid" ? "pay" : idea.accessMode === "trust" || idea.accessMode === "hybrid" ? "trust" : "request");
     setTier("build");
     setRole("");
     setNote("");
@@ -58,6 +60,9 @@ export function AccessRequestDialog({
 
   if (!idea) return <Dialog open={false} />;
   const price = idea.accessPricing[tier];
+  const trustEligible = !!currentUser && currentUser.credibility >= idea.trustThreshold;
+  const allowsTrust = idea.accessMode === "trust" || idea.accessMode === "hybrid";
+  const allowsPayment = idea.accessMode === "paid" || idea.accessMode === "hybrid";
   const tierCopy: Record<AccessTier, { title: string; detail: string; features: string[] }> = {
     context: {
       title: "Context",
@@ -100,15 +105,16 @@ export function AccessRequestDialog({
           <DialogDescription className="text-white/42">
             {checkout
               ? "Confirm the selected project tier. No real payment is processed in this MVP."
-              : "Request creator approval or unlock a project plan instantly. Creator requests auto-approve in this MVP."}
+              : "Use the access path chosen by the creator. Trust can unlock the Builder Kit; payment or approval can unlock more."}
           </DialogDescription>
         </DialogHeader>
 
         {!checkout ? (
           <>
             <div className="ph-access-path-toggle">
-              <button type="button" className={path === "request" ? "active" : ""} onClick={() => setPath("request")}><KeyRound /><span><strong>Request access</strong><small>Creator-approved path · auto in MVP</small></span></button>
-              <button type="button" className={path === "pay" ? "active" : ""} onClick={() => setPath("pay")}><CreditCard /><span><strong>Instant access</strong><small>Choose and unlock a paid tier</small></span></button>
+              {allowsTrust && <button type="button" className={path === "trust" ? "active" : ""} onClick={() => setPath("trust")}><ShieldCheck /><span><strong>Trust access</strong><small>{idea.trustThreshold}+ credibility · free Builder Kit</small></span></button>}
+              {allowsPayment && <button type="button" className={path === "pay" ? "active" : ""} onClick={() => setPath("pay")}><CreditCard /><span><strong>Paid access</strong><small>Choose a project tier</small></span></button>}
+              {idea.accessMode !== "paid" && <button type="button" className={path === "request" ? "active" : ""} onClick={() => setPath("request")}><KeyRound /><span><strong>Ask the creator</strong><small>Personal request · auto-approved in demo</small></span></button>}
             </div>
 
             {path === "request" ? (
@@ -125,6 +131,18 @@ export function AccessRequestDialog({
                   <Label htmlFor="access-note" className="text-xs text-white/45">A short note <span className="text-white/22">(optional)</span></Label>
                   <Textarea id="access-note" value={note} onChange={(event) => setNote(event.target.value)} placeholder="Relevant experience, an introduction, or the first thing you would test." className="min-h-24 border-white/10 bg-white/[0.035] text-white placeholder:text-white/25" />
                 </div>
+              </div>
+            ) : path === "trust" ? (
+              <div className="space-y-4 py-2">
+                <div className={cn("rounded-2xl border p-5", trustEligible ? "border-white/20 bg-white/[0.06]" : "border-white/[0.08] bg-white/[0.025]")}>
+                  <div className="flex items-center gap-4">
+                    <span className={cn("flex size-12 items-center justify-center rounded-full", trustEligible ? "bg-white text-black" : "bg-white/[0.06] text-white/35")}><ShieldCheck /></span>
+                    <span className="min-w-0 flex-1"><small className="block text-[10px] uppercase tracking-[0.12em] text-white/30">Your credibility</small><strong className="mt-1 block text-2xl text-white">{currentUser?.credibility ?? 0}</strong></span>
+                    <span className="text-right"><small className="block text-[10px] text-white/30">Required</small><strong className="mt-1 block text-lg text-white/65">{idea.trustThreshold}+</strong></span>
+                  </div>
+                  <p className="mt-4 text-xs leading-6 text-white/40">{trustEligible ? "You qualify. Unlock the Builder Kit free based on your connected identity, execution and community credibility." : "Connect more social proof or build your PassionHouse history to qualify. You can still ask the creator directly."}</p>
+                </div>
+                <div className="rounded-xl border border-white/[0.08] p-4"><strong className="text-sm text-white/70">Builder Kit includes</strong><div className="mt-3 flex flex-wrap gap-2">{tierCopy.build.features.map((feature) => <span key={feature} className="rounded-full bg-white/[0.05] px-2.5 py-1.5 text-[10px] text-white/38">{feature}</span>)}</div></div>
               </div>
             ) : (
               <div className="space-y-3 py-2">
@@ -172,6 +190,9 @@ export function AccessRequestDialog({
           )}
           {!checkout && path === "pay" && (
             <Button type="button" className="bg-white text-black hover:bg-white/85" onClick={() => setCheckout(true)}><CreditCard />Continue · {price === 0 ? "Free" : "$" + price}</Button>
+          )}
+          {!checkout && path === "trust" && (
+            <Button type="button" disabled={!trustEligible} className="bg-white text-black hover:bg-white/85" onClick={() => onSubmit(idea, { tier: "build", role: "Trust-qualified builder", note: "Builder Kit unlocked through PassionHouse credibility.", method: "trust" })}><ShieldCheck />{trustEligible ? "Unlock Builder Kit free" : "Trust score not high enough"}</Button>
           )}
           {checkout && (
             <Button type="button" disabled={processing} className="bg-white text-black hover:bg-white/85" onClick={completePayment}>{processing ? "Processing…" : price === 0 ? "Unlock free tier" : "Complete demo payment"}</Button>
@@ -251,7 +272,7 @@ export function ProposalDialog({
 }
 
 export type PostSubmission = {
-  postType: "post" | "idea";
+  postType: ContentType;
   title: string;
   oneLiner: string;
   description: string;
@@ -261,13 +282,9 @@ export type PostSubmission = {
   ask: string;
   evidence: string;
   disclosure: "open" | "tiered";
+  accessMode: AccessMode;
+  trustThreshold: number;
   media: MediaAttachment[];
-  funding?: {
-    audience: FundingAudience;
-    amount: string;
-    summary: string;
-    useOfFunds: string;
-  };
 };
 
 export function PostIdeaDialog({
@@ -279,7 +296,7 @@ export function PostIdeaDialog({
   onClose: () => void;
   onSubmit: (input: PostSubmission) => void;
 }) {
-  const [postType, setPostType] = React.useState<"post" | "idea">("post");
+  const [postType, setPostType] = React.useState<ContentType>("post");
   const [quickBody, setQuickBody] = React.useState("");
   const [title, setTitle] = React.useState("");
   const [oneLiner, setOneLiner] = React.useState("");
@@ -290,12 +307,9 @@ export function PostIdeaDialog({
   const [ask, setAsk] = React.useState("");
   const [evidence, setEvidence] = React.useState("");
   const [disclosure, setDisclosure] = React.useState<"open" | "tiered">("open");
+  const [accessMode, setAccessMode] = React.useState<AccessMode>("public");
+  const [trustThreshold, setTrustThreshold] = React.useState(78);
   const [media, setMedia] = React.useState<MediaAttachment[]>([]);
-  const [fundingEnabled, setFundingEnabled] = React.useState(false);
-  const [fundingAudience, setFundingAudience] = React.useState<FundingAudience>("both");
-  const [fundingAmount, setFundingAmount] = React.useState("");
-  const [fundingSummary, setFundingSummary] = React.useState("");
-  const [useOfFunds, setUseOfFunds] = React.useState("");
 
   React.useEffect(() => {
     if (!open) return;
@@ -310,12 +324,9 @@ export function PostIdeaDialog({
     setAsk("");
     setEvidence("");
     setDisclosure("open");
+    setAccessMode("public");
+    setTrustThreshold(78);
     setMedia([]);
-    setFundingEnabled(false);
-    setFundingAudience("both");
-    setFundingAmount("");
-    setFundingSummary("");
-    setUseOfFunds("");
   }, [open]);
 
   React.useEffect(() => {
@@ -362,11 +373,14 @@ export function PostIdeaDialog({
         ask: "",
         evidence: "",
         disclosure: "open",
+        accessMode: "public",
+        trustThreshold: 0,
         media: media.map((item) => ({ ...item, visibility: "public" })),
       });
       return;
     }
 
+    const isArticle = postType === "article";
     onSubmit({
       postType,
       title,
@@ -374,28 +388,20 @@ export function PostIdeaDialog({
       description,
       fullDetails: fullDetails.trim() || description,
       category,
-      stage,
-      ask,
-      evidence,
-      disclosure,
-      media,
-      funding: fundingEnabled ? {
-        audience: fundingAudience,
-        amount: fundingAmount,
-        summary: fundingSummary,
-        useOfFunds,
-      } : undefined,
+      stage: isArticle ? "Validated" : stage,
+      ask: isArticle ? "" : ask,
+      evidence: isArticle ? "" : evidence,
+      disclosure: isArticle ? "open" : accessMode === "public" ? "open" : "tiered",
+      accessMode: isArticle ? "public" : accessMode,
+      trustThreshold: isArticle ? 0 : trustThreshold,
+      media: isArticle ? media.map((item) => ({ ...item, visibility: "public" as const })) : media,
     });
   }
 
   const ideaReady =
     title.trim().length >= 2 &&
     oneLiner.trim().length >= 10 &&
-    description.trim().length >= 20 &&
-    (!fundingEnabled ||
-      (fundingAmount.trim().length >= 2 &&
-        fundingSummary.trim().length >= 10 &&
-        useOfFunds.trim().length >= 8));
+    description.trim().length >= 20;
 
   return (
     <Dialog open={open} onOpenChange={(next) => !next && onClose()}>
@@ -404,7 +410,7 @@ export function PostIdeaDialog({
           <p className="ph-eyebrow">Create · public by default</p>
           <DialogTitle className="mt-2 text-2xl tracking-[-0.04em]">Share the thought at the size it deserves.</DialogTitle>
           <DialogDescription className="text-white/42">
-            Post one useful sentence or publish the complete idea. Structure is optional; clarity is not.
+            Post one useful sentence, explain an idea, or publish a thoughtful article. Funding comes later when the idea is ready.
           </DialogDescription>
         </DialogHeader>
 
@@ -413,7 +419,10 @@ export function PostIdeaDialog({
             <MessageCircle /><span><strong>Quick post</strong><small>A thought, question, update or ask</small></span>
           </button>
           <button type="button" className={postType === "idea" ? "active" : ""} onClick={() => setPostType("idea")}>
-            <Lightbulb /><span><strong>Full idea</strong><small>Thesis, proof, access and funding</small></span>
+            <Lightbulb /><span><strong>Idea</strong><small>Share something people can help build</small></span>
+          </button>
+          <button type="button" className={postType === "article" ? "active" : ""} onClick={() => setPostType("article")}>
+            <BookOpen /><span><strong>Article</strong><small>Long-form thinking and lessons</small></span>
           </button>
         </div>
 
@@ -448,33 +457,27 @@ export function PostIdeaDialog({
         ) : (
           <div className="grid gap-4 py-2">
             <div className="rounded-xl border border-white/[0.08] bg-white/[0.025] p-3 text-xs leading-5 text-white/40">
-              Only the name, summary and public overview are required. Everything else improves the signal but can be added later.
+              {postType === "article" ? "Give readers a clear title, short introduction and the complete article." : "Only the name, summary and public overview are required. Builder details can be added without turning this into a long form."}
             </div>
-            <FormField label="Idea name" value={title} onChange={setTitle} placeholder="A short, memorable name" />
-            <FormField label="One-line thesis" value={oneLiner} onChange={setOneLiner} placeholder="What changes, for whom, and why now?" />
+            <FormField label={postType === "article" ? "Article title" : "Idea name"} value={title} onChange={setTitle} placeholder={postType === "article" ? "A title people want to open" : "A short, memorable name"} />
+            <FormField label={postType === "article" ? "One-line takeaway" : "One-line thesis"} value={oneLiner} onChange={setOneLiner} placeholder={postType === "article" ? "What will the reader understand?" : "What changes, for whom, and why now?"} />
             <div className="grid gap-2">
-              <Label htmlFor="idea-description" className="text-xs text-white/45">Public overview</Label>
-              <Textarea id="idea-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="Explain the problem, your insight and the approach in plain language." className="min-h-32 resize-y border-white/10 bg-white/[0.035] text-white placeholder:text-white/25" />
+              <Label htmlFor="idea-description" className="text-xs text-white/45">{postType === "article" ? "Introduction" : "Public overview"}</Label>
+              <Textarea id="idea-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder={postType === "article" ? "Set up the question, story or lesson in plain language." : "Explain the problem, your insight and the approach in plain language."} className="min-h-32 resize-y border-white/10 bg-white/[0.035] text-white placeholder:text-white/25" />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="idea-details" className="text-xs text-white/45">Complete idea <span className="text-white/22">(optional)</span></Label>
-              <Textarea id="idea-details" value={fullDetails} onChange={(event) => setFullDetails(event.target.value)} placeholder="Execution plan, business model, milestones, risks or anything a serious collaborator should know." maxLength={10000} className="min-h-36 resize-y border-white/10 bg-white/[0.035] text-white placeholder:text-white/25" />
+              <Label htmlFor="idea-details" className="text-xs text-white/45">{postType === "article" ? "Article body" : "Deeper idea"} <span className="text-white/22">(optional)</span></Label>
+              <Textarea id="idea-details" value={fullDetails} onChange={(event) => setFullDetails(event.target.value)} placeholder={postType === "article" ? "Write the complete article. Use blank lines to separate ideas." : "Explain how it could work, the first test, business direction or risks."} maxLength={12000} className="min-h-44 resize-y border-white/10 bg-white/[0.035] text-white placeholder:text-white/25" />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className={cn("grid gap-4", postType === "idea" && "sm:grid-cols-2")}>
               <div className="grid gap-2"><Label className="text-xs text-white/45">Sector</Label><Select value={category} onValueChange={(value) => setCategory(value ?? "AI")}><SelectTrigger className="w-full border-white/10 bg-white/[0.035] text-white"><SelectValue /></SelectTrigger><SelectContent className="border-white/10 bg-[#121416] text-white">{CATEGORIES.slice(1).map((item) => <SelectItem key={item} value={item} className="focus:bg-white/10 focus:text-white">{item}</SelectItem>)}</SelectContent></Select></div>
-              <div className="grid gap-2"><Label className="text-xs text-white/45">Stage</Label><Select value={stage} onValueChange={(value) => setStage(value ?? "Concept")}><SelectTrigger className="w-full border-white/10 bg-white/[0.035] text-white"><SelectValue /></SelectTrigger><SelectContent className="border-white/10 bg-[#121416] text-white">{STAGES.slice(1).map((item) => <SelectItem key={item} value={item} className="focus:bg-white/10 focus:text-white">{item}</SelectItem>)}</SelectContent></Select></div>
+              {postType === "idea" && <div className="grid gap-2"><Label className="text-xs text-white/45">Stage</Label><Select value={stage} onValueChange={(value) => setStage(value ?? "Concept")}><SelectTrigger className="w-full border-white/10 bg-white/[0.035] text-white"><SelectValue /></SelectTrigger><SelectContent className="border-white/10 bg-[#121416] text-white">{STAGES.slice(1).map((item) => <SelectItem key={item} value={item} className="focus:bg-white/10 focus:text-white">{item}</SelectItem>)}</SelectContent></Select></div>}
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            {postType === "idea" && <div className="grid gap-4 sm:grid-cols-2">
               <FormField label="Who or what would help? (optional)" value={ask} onChange={setAsk} placeholder="Engineer, investor, pilot users…" />
               <FormField label="Strongest proof (optional)" value={evidence} onChange={setEvidence} placeholder="Interviews, waitlist, prototype…" />
-            </div>
-            <div>
-              <Label className="text-xs text-white/45">Idea visibility</Label>
-              <div className="mt-2 grid gap-2 sm:grid-cols-2">
-                <button type="button" onClick={() => setDisclosure("open")} className={cn("ph-disclosure-choice", disclosure === "open" && "active")}><Globe2 /><span><strong>Completely public</strong><small>Default · anyone can read everything</small></span>{disclosure === "open" && <CheckCircle2 />}</button>
-                <button type="button" onClick={() => setDisclosure("tiered")} className={cn("ph-disclosure-choice", disclosure === "tiered" && "active")}><Lock /><span><strong>Public preview</strong><small>Full idea unlocks instantly in this MVP</small></span>{disclosure === "tiered" && <CheckCircle2 />}</button>
-              </div>
-            </div>
+            </div>}
+            {postType === "idea" && <AccessModePicker mode={accessMode} threshold={trustThreshold} onMode={(mode) => { setAccessMode(mode); setDisclosure(mode === "public" ? "open" : "tiered"); }} onThreshold={setTrustThreshold} />}
           </div>
         )}
 
@@ -507,24 +510,6 @@ export function PostIdeaDialog({
           )}
         </div>
 
-        {postType === "idea" && (
-          <div className="border-t border-white/[0.07] pt-4">
-            <button type="button" onClick={() => setFundingEnabled((value) => !value)} className={cn("ph-funding-toggle", fundingEnabled && "active")}>
-              <CircleDollarSign /><span><strong>Pitch for funding now</strong><small>Send to investors, PassionHouse, or both</small></span><span>{fundingEnabled ? "On" : "Optional"}</span>
-            </button>
-            {fundingEnabled && (
-              <div className="mt-4 grid gap-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-4">
-                <div className="grid grid-cols-3 gap-2">
-                  {(["investors", "passionhouse", "both"] as FundingAudience[]).map((value) => <button type="button" key={value} onClick={() => setFundingAudience(value)} className={cn("ph-mini-choice", fundingAudience === value && "active")}>{value === "investors" ? "Investors" : value === "passionhouse" ? "PassionHouse" : "Both"}</button>)}
-                </div>
-                <FormField label="Amount requested" value={fundingAmount} onChange={setFundingAmount} placeholder="e.g. $150,000" />
-                <FormField label="Funding milestone" value={fundingSummary} onChange={setFundingSummary} placeholder="What becomes possible?" />
-                <FormField label="Use of funds" value={useOfFunds} onChange={setUseOfFunds} placeholder="Engineering, pilots, audits…" />
-              </div>
-            )}
-          </div>
-        )}
-
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose} className="text-white/55 hover:bg-white/10 hover:text-white">Cancel</Button>
           <Button
@@ -533,11 +518,51 @@ export function PostIdeaDialog({
             onClick={publish}
             className="bg-white text-black hover:bg-white/85"
           >
-            {postType === "post" ? <Send /> : <Rocket />}
-            {postType === "post" ? "Post publicly" : "Publish idea"}
+            {postType === "post" ? <Send /> : postType === "article" ? <BookOpen /> : <Rocket />}
+            {postType === "post" ? "Post publicly" : postType === "article" ? "Publish article" : "Publish idea"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function AccessModePicker({
+  mode,
+  threshold,
+  onMode,
+  onThreshold,
+}: {
+  mode: AccessMode;
+  threshold: number;
+  onMode: (mode: AccessMode) => void;
+  onThreshold: (value: number) => void;
+}) {
+  const choices: Array<{ value: AccessMode; title: string; detail: string; icon: React.ElementType }> = [
+    { value: "public", title: "Open to everyone", detail: "Every written section is public", icon: Globe2 },
+    { value: "trust", title: "Unlock with trust", detail: "Credible builders enter free", icon: ShieldCheck },
+    { value: "paid", title: "Paid builder tiers", detail: "Unlock Builder Kit or Execution Room", icon: CreditCard },
+    { value: "hybrid", title: "Trust or paid", detail: "Qualify by credibility or choose a plan", icon: KeyRound },
+  ];
+  return (
+    <div>
+      <Label className="text-xs text-white/45">Who can read the deeper builder material?</Label>
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        {choices.map(({ value, title, detail, icon: Icon }) => (
+          <button type="button" key={value} onClick={() => onMode(value)} className={cn("ph-disclosure-choice", mode === value && "active")}>
+            <Icon /><span><strong>{title}</strong><small>{detail}</small></span>{mode === value && <CheckCircle2 />}
+          </button>
+        ))}
+      </div>
+      {(mode === "trust" || mode === "hybrid") && (
+        <div className="mt-3 flex items-center gap-3 rounded-xl border border-white/[0.08] bg-white/[0.025] px-4 py-3">
+          <ShieldCheck className="size-4 text-white/45" />
+          <span className="min-w-0 flex-1"><strong className="block text-xs text-white/65">Trust score required</strong><small className="mt-1 block text-[10px] text-white/30">Builders at or above this credibility unlock the Builder Kit free.</small></span>
+          <select value={threshold} onChange={(event) => onThreshold(Number(event.target.value))} className="rounded-lg border border-white/10 bg-black px-3 py-2 text-xs text-white outline-none">
+            {[65, 70, 75, 78, 80, 85, 90].map((score) => <option key={score} value={score}>{score}+</option>)}
+          </select>
+        </div>
+      )}
+    </div>
   );
 }

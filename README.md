@@ -1,142 +1,128 @@
 # PassionHouse
 
-**The public network where thoughts become teams, funding and real projects.**
+**A public home where ideas find builders, support and a path to becoming real.**
 
-PassionHouse combines an X-style idea feed, credible social identity, controlled project access, funding discovery and private execution. A user can share one casual sentence or publish a complete venture thesis, then find the people and capital needed to move it forward.
+I wanted to build a platform for a simple situation: I may have a valuable idea but not the skills, team or money to build it. Somewhere else, a capable developer, designer or operator may want to build something meaningful but does not have the right idea.
 
-The platform takes **0% equity**.
+PassionHouse brings those people together.
 
-## Why it exists
+An idea owner can explain what should exist. Builders can discover it, understand the deeper plan and offer their skills. Readers can improve it through discussion, tip useful thinking or back the next milestone. If the project earns enough proof, the creator can make a clear grant or investor ask.
 
-The internet has many places to post and many tools to manage established teams, but very little infrastructure between those moments. Promising ideas lose momentum because:
+PassionHouse takes **0% equity**.
 
-- useful thoughts are buried by attention-driven feeds;
-- creators cannot quickly distinguish credible collaborators from noise;
-- sensitive plans are either exposed too early or hidden too completely;
-- funding requests are detached from visible proof and community response;
-- replies, DMs, proposals, terms and delivery live in separate tools.
+Social feeds produce attention but little commitment, while project tools assume a team already exists. PassionHouse connects the missing journey:
 
-PassionHouse creates one continuous path:
+**Share → understand → trust → support → build → fund → deliver**
 
-**Post → signal → trust → access → funding/proposal → deal room → delivery**
+## What the MVP demonstrates
 
-## What this MVP includes
+### Share at the right size
 
-### A social feed for ideas of every size
+Users can publish three kinds of public content:
 
-- Quick posts for questions, updates, observations and casual asks
-- Full ideas with overview, complete plan, proof, media and collaborators needed
-- “For you,” Ideas, Quick posts and Latest feed channels
-- Search, sector/stage filters and signal-based ranking
-- Likes, dislikes, comments and builder-interest signals
-- Image and video uploads in the browser demo
-- Floating `+` composer available while scrolling
+- **Post:** a quick thought, question, update or request.
+- **Idea:** a structured opportunity that other people can help build.
+- **Article:** long-form thinking, research, lessons or strategy.
 
-All content is public by default. A full idea can be completely open or use a public preview with protected project material.
+Posting stays simple. Funding is intentionally handled later, after the idea has one clear next milestone.
 
-### Tiered and paid project access
+### A feed designed for reading
 
-Each full idea supports three plans:
+Posts, ideas and articles look different instead of repeating one heavy card. The feed includes dedicated channels, search, filters, reactions, discussion, tips, builder interest, media and a floating create button.
 
-1. **Context** — public research and problem framing; free
-2. **Build Plan** — workflow, validation and build priorities; demo price `$19`
-3. **Full Project** — commercial plan, private media and execution material; demo price `$49`
+### Full-screen idea reader
 
-Two access paths are demonstrated:
+Opening an idea or article uses the complete screen instead of a narrow side panel. It brings together the creator, readable numbered sections, media, validation, required skills, access, funding progress, support actions and discussion.
 
-- **Request access:** creator-review flow that auto-approves Full Project access in the MVP.
-- **Instant access:** tier selection, order summary, simulated card checkout and immediate unlock.
+Paid or trusted access now reveals real additional sections instead of only changing a label.
 
-No real payment is processed. Pricing is seeded only to demonstrate the product and upgrade flow.
+### Creator-controlled idea access
 
-### Funding before or after collaboration
+Every idea can use one of four modes:
 
-Creators can pitch:
+1. **Public** — everyone can read every written section.
+2. **Trust** — builders above the creator’s credibility threshold unlock the Builder Kit free.
+3. **Paid** — readers choose a one-time project access plan.
+4. **Hybrid** — qualify through trust or use the paid path.
 
-- verified investors;
-- the PassionHouse project fund;
-- or both audiences together.
+The project layers are:
 
-A funding pitch records the amount, milestone, use of funds and review status. The Funding channel shows open opportunities, creator submissions, funded examples and investor-interest signals.
+- **Context:** public problem, thesis and opportunity.
+- **Builder Kit:** product workflow, validation, requirements and builder brief.
+- **Execution Room:** roadmap, commercial direction, risks and protected materials.
 
-### Trust-aware people discovery
+Demo prices are `$19` for the Builder Kit and `$49` for the Execution Room. Creator requests auto-approve in this MVP so the full flow can be tested instantly.
+
+### Tip anyone
+
+Readers can send a simulated `$5`, `$10`, `$25` or `$50` tip to:
+
+- a useful post;
+- a complete idea;
+- an article;
+- an individual builder profile;
+- or a developer actively building a project.
+
+Ideas can also be backed specifically rather than tipped generally. No real payment is processed in the MVP.
+
+### Funding that is easier to understand
+
+Support has three clear sizes:
+
+1. **Tip useful work** — small appreciation with no pitch required.
+2. **Back one milestone** — support a prototype, pilot, audit or launch target.
+3. **Fund the project** — a PassionHouse grant or investor raise for a validated idea.
+
+Every serious funding ask answers five questions:
+
+- How much is needed?
+- What becomes true if it is funded?
+- What will the money pay for?
+- What proof already exists?
+- How long will the milestone take?
+
+Funding remains attached to the public idea, its creator and its progress.
+
+### Builders can move from interest to work
+
+- Mark an idea with **I can help**
+- See the exact roles and commitment needed
+- Unlock the Builder Kit through trust or payment
+- Send a scoped contribution proposal
+- Agree on scope, budget, timeline and ownership
+- Open a private deal room after acceptance
+- Track chat, documents and milestones
+
+### Identity and credibility
 
 - Demo X sign-in and persona switching
-- Searchable people, skills, roles and social handles
-- Human and NFT/Web3-style identities
-- Connected X, LinkedIn, GitHub, Instagram and website profiles
-- Credibility based on identity, execution, community and responsiveness
-- Direct social/contact routes from public profiles
+- Search people, skills, roles and social handles
+- Human and NFT/Web3 identities
+- Connected X, LinkedIn, GitHub, Instagram and websites
+- Credibility from identity, execution, community and responsiveness
+- Trust-based access powered by the visible credibility score
 
-### Collaboration and execution
+## Demo walkthrough
 
-- Structured contribution proposals
-- Scope, timeline, budget and outcome terms
-- Proposal acceptance that opens a private deal room
-- Chat, milestones, documents and agreement summary
-- Explicit ownership language and 0% platform equity
+1. Continue with X as Maya Chen.
+2. Scroll the mixed feed and compare a Post, Idea and Article.
+3. Open an idea to enter the full-screen reader.
+4. Open Nightjar and unlock its Builder Kit using Maya’s trust score.
+5. Open ChainCred and test the paid access flow.
+6. Tip an article, back Loopline’s milestone and tip a builder profile.
+7. Publish a new idea and choose Public, Trust, Paid or Hybrid access.
+8. Open Funding and create one clear milestone, grant or investor ask.
+9. Offer to help build an idea, then inspect proposals and the deal room.
 
-## Demo data
+## Technology
 
-The seed includes 20 full ideas and quick posts across AI, Web3, climate, health, fintech, civic technology, creator economy, education and the future of work. It also includes ten varied profiles, funding pitches, access records, proposals, comments and an active deal room.
+Next.js 15, React 19, strict TypeScript, Tailwind CSS 4, Radix/shadcn, Lucide and Sonner. The seed includes more than 20 ideas, posts and articles, ten profiles, all four access modes, funding asks, proposals and an active deal room.
 
-Suggested walkthrough:
-
-1. Continue with X as Maya Chen or choose a Web3 persona.
-2. Switch between Ideas and Quick posts in Discover.
-3. Open a fully public idea and a protected-preview idea.
-4. Choose **Request access** to test automatic MVP approval.
-5. Reopen access and test the paid Build Plan or Full Project checkout.
-6. Open Funding, inspect opportunities and submit a creator pitch.
-7. Search people and inspect connected socials and credibility.
-8. Review proposals and use the active Nightjar deal room.
-9. Use the floating `+` button to publish a quick post or complete idea.
-
-## Design
-
-The interface carries the HoodX visual language into a friendlier product system:
-
-- black and graphite foundation with restrained blue/pink signal accents;
-- star field, orbital lines, binary fragments and meteor motion;
-- lightweight glass surfaces and high-contrast actions;
-- custom cursor, scroll progress and reduced-motion support;
-- responsive feed, sheets, dialogs and mobile navigation;
-- illustrated human and Web3/NFT profile avatars.
-
-## Stack
-
-- Next.js 15 App Router
-- React 19 + strict TypeScript
-- Tailwind CSS 4
-- Radix/shadcn primitives
-- Lucide icons + Sonner notifications
-- Versioned browser-local repository
-
-## Project structure
-
-```text
-app/                               route, metadata and global design system
-components/passionhouse-shell.tsx  application state and flow orchestration
-components/passionhouse/
-  discovery.tsx                    feed, posts and idea detail
-  composer-dialogs.tsx             quick/full composer and access checkout
-  funding.tsx                      funding channel and pitch flow
-  collaboration-views.tsx          requests, proposals and deal rooms
-  people-views.tsx                 people, profiles and demo auth
-  passionhouse-ui.tsx              shared product primitives
-lib/
-  passionhouse-types.ts            typed domain model
-  passionhouse-demo.ts             compact seeded MVP data
-  passionhouse-repository.ts       replaceable local persistence adapter
-public/avatars/                    original illustrated profile art
-public/media/                      project demo media
-```
-
-The UI never writes to `localStorage` directly. The repository adapter can later be replaced by Supabase/Postgres and server APIs without rewriting the product views.
+The demo stores data locally behind a repository adapter. Supabase, Postgres, object storage, real authentication and payment services can replace it without rewriting the main product views.
 
 ## Run locally
 
-Requirements: Node.js 20+ and npm.
+Requires Node.js 20 or newer.
 
 ```bash
 npm ci
@@ -145,7 +131,7 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-Validate the complete project:
+Validate everything:
 
 ```bash
 npm run check
@@ -154,36 +140,40 @@ npm run check
 ## Deploy to Vercel
 
 1. Push the repository to GitHub.
-2. Import it into Vercel with the **Next.js** framework preset.
-3. Keep Root Directory at the repository root.
-4. Leave Build Command and Install Command overrides disabled.
-5. Deploy. No environment variables are required for this MVP.
+2. Import it with the Next.js framework preset.
+3. Keep the repository root as the Root Directory.
+4. Leave Build and Install commands at their defaults.
+5. Deploy; the MVP requires no environment variables.
 
-The included `vercel.json` pins the Next.js preset and clears any stale custom Output Directory. This prevents the previous `No Output Directory named "output"` failure. If the dashboard still shows an Output Directory override, switch it off and redeploy without the build cache.
+The included `vercel.json` clears a stale custom Output Directory and prevents the earlier `No Output Directory named "output"` failure.
 
-## Demo boundaries
+## MVP boundaries
 
-- X OAuth, social metrics, investor interest and payments are simulated.
-- Uploaded media is stored as local browser data and should remain small.
-- Local passwords are demo-only client-side hashes, not production authentication.
-- Deal-room documents store metadata only.
-- There is no server authorization, object storage, payment settlement or escrow yet.
-- Do not use real secrets, financial details or confidential project files.
+- X OAuth, social metrics and credibility verification are simulated.
+- Tips, access purchases and funding are demo transactions only.
+- Uploaded media stays in local browser storage and should remain small.
+- Client-side demo authentication is not production security.
+- Protected access is demonstrated in the UI, not enforced by a server.
+- Never enter real secrets, card data or confidential project documents.
 
-## Production path
+## Production direction
 
-1. Real X OAuth and verified social connections
-2. Postgres/Supabase, object storage and server-enforced tier permissions
-3. Creator-defined pricing, Stripe/crypto checkout and revenue settlement
-4. Transparent credibility, anti-gaming and verified work outcomes
-5. Semantic matching, notifications and personalized feeds
-6. E-signatures, escrow, milestone approvals and durable deal-room chat
+1. Real X OAuth, verified socials and transparent reputation events
+2. Postgres/Supabase with server-enforced access permissions
+3. Creator pricing, Stripe/crypto checkout and revenue settlement
+4. Tip balances, milestone escrow and refund rules
+5. Personalized discovery and semantic builder matching
+6. Versioned ideas, build logs and supporter updates
+7. Investor data rooms, e-signatures and milestone approvals
+8. Notifications, moderation and anti-spam systems
 
-## The long-term opportunity
+## Long-term vision
 
-PassionHouse is not merely another place to post startup concepts. It can become the coordination layer between public intent and committed work.
+PassionHouse can become the network around the earliest stage of creation.
 
-Every successful project improves the network: ideas gain evidence, people gain portable proof, investors see momentum in context, and future teams form with less uncertainty. If PassionHouse closes that loop, an ordinary post can become a trusted collaboration without losing its energy—or its creator—between disconnected platforms.
+Someone should be able to arrive with only a thought, explain it clearly, meet a person who can build it, earn public support, protect the sensitive parts, fund one real milestone and leave with a working project. Builders gain a stream of meaningful opportunities. Creators keep ownership. Supporters can participate before an idea becomes obvious.
+
+That is the house: ideas enter as words and leave with people behind them.
 
 ## License
 

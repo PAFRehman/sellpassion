@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import {
-  BriefcaseBusiness, CheckCircle2, ChevronRight, ExternalLink, Link2, Lock, MapPin,
+  BriefcaseBusiness, CheckCircle2, ChevronRight, Coffee, ExternalLink, Link2, Lock, MapPin,
   Search, ShieldCheck, UserSearch,
 } from "lucide-react";
 
@@ -24,11 +24,13 @@ export function PeopleView({
   ideas,
   currentUserId,
   onOpenProfile,
+  onTip,
 }: {
   users: UserProfile[];
   ideas: Idea[];
   currentUserId: string | null;
   onOpenProfile: (id: string) => void;
+  onTip: (id: string) => void;
 }) {
   const [query, setQuery] = React.useState("");
   const matches = users
@@ -87,7 +89,8 @@ export function PeopleView({
                     </a>
                   ))}
                 </div>
-                <div className="flex gap-4 font-mono text-[10px] text-white/30">
+                <div className="flex items-center gap-3 font-mono text-[10px] text-white/30">
+                  {user.id !== currentUserId && <button type="button" onClick={() => onTip(user.id)} className="flex items-center gap-1 rounded-full border border-white/10 px-2 py-1 text-white/45 hover:bg-white/10 hover:text-white"><Coffee className="size-3" />Tip</button>}
                   <span>{ideaCount} ideas</span><span>{user.projectsBuilt} builds</span>
                 </div>
               </div>
@@ -250,11 +253,13 @@ export function PublicProfileSheet({
   ideas,
   onOpenChange,
   onOpenIdea,
+  onTip,
 }: {
   user: UserProfile | null;
   ideas: Idea[];
   onOpenChange: (open: boolean) => void;
   onOpenIdea: (ideaId: string) => void;
+  onTip: (userId: string) => void;
 }) {
   if (!user) return <Sheet open={false} />;
   const connected = user.socials.filter((social) => social.connected);
@@ -289,6 +294,7 @@ export function PublicProfileSheet({
             <Button asChild variant="outline" className="border-white/10 bg-white/[0.03] text-white hover:bg-white/10 hover:text-white">
               <a href={"mailto:" + user.email}>Email</a>
             </Button>
+            <Button type="button" variant="outline" onClick={() => onTip(user.id)} className="border-white/10 bg-white/[0.03] text-white hover:bg-white/10 hover:text-white"><Coffee />Tip this builder</Button>
           </div>
 
           <div className="mt-7 grid grid-cols-3 gap-2 border-y border-white/[0.07] py-5">
@@ -450,4 +456,3 @@ export function AuthDialog({
     </Dialog>
   );
 }
-

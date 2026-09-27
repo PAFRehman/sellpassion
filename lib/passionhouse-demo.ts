@@ -149,6 +149,20 @@ type IdeaSeed = Pick<Idea, "id" | "creatorId" | "title" | "oneLiner" | "descript
   Partial<Omit<Idea, "id" | "creatorId" | "title" | "oneLiner" | "description" | "category" | "stage" | "createdAt">>;
 
 function idea(seed: IdeaSeed): Idea {
+  const kind = seed.postType ?? "idea";
+  const completeCopy = seed.fullDetails ?? seed.description;
+  const defaultSections: Idea["sections"] = kind === "post"
+    ? []
+    : kind === "article"
+      ? [
+          { id: seed.id + "-opening", label: "Essay", title: seed.oneLiner, body: completeCopy, access: "public" },
+          { id: seed.id + "-takeaway", label: "Takeaway", title: "What this changes", body: seed.description, access: "public" },
+        ]
+      : [
+          { id: seed.id + "-why", label: "The opportunity", title: "Why this should exist", body: seed.description, access: "public" },
+          { id: seed.id + "-build", label: "Builder kit", title: "How the product could work", body: completeCopy, access: "build" },
+          { id: seed.id + "-execute", label: "Execution room", title: "From idea to a working project", body: "Start with one narrow user problem, recruit the first committed builder and validate the riskiest assumption before expanding. The execution room connects the roadmap, commercial direction, open questions and protected working materials.", access: "full", bullets: seed.asks?.length ? seed.asks : ["Define the first test", "Recruit a complementary builder", "Publish the learning"] },
+        ];
   return {
     signal: 76,
     tags: [seed.category, seed.stage],
@@ -160,8 +174,10 @@ function idea(seed: IdeaSeed): Idea {
     commentsCount: 0,
     visibility: "public",
     media: [],
-    postType: "idea",
+    postType: kind,
     disclosure: "open",
+    accessMode: seed.disclosure === "tiered" ? "hybrid" : "public",
+    trustThreshold: 78,
     fullDetails: seed.description,
     accessTiers: {
       context: "Problem framing, audience insight and the opportunity map.",
@@ -169,6 +185,13 @@ function idea(seed: IdeaSeed): Idea {
       full: "Complete execution plan, commercial model, risks and private materials.",
     },
     accessPricing: { currency: "USD", context: 0, build: 19, full: 49 },
+    readingTime: kind === "post" ? 1 : kind === "article" ? 6 : 4,
+    sections: defaultSections,
+    buildNeeds: (seed.asks ?? []).slice(0, 3).map((role) => ({ role, contribution: "Help turn the strongest assumption into a working test.", commitment: "Flexible · start with one sprint" })),
+    tipsTotal: kind === "post" ? 84 : 420,
+    tipCount: kind === "post" ? 6 : 18,
+    backerCount: kind === "idea" ? 12 : 0,
+    progress: kind === "idea" ? 38 : 100,
     ...seed,
   };
 }
@@ -190,11 +213,18 @@ const ideas: Idea[] = [
     oneLiner: "A private AI workspace for teams that cannot leak the question.",
     description: "A deployable research and drafting copilot for regulated teams, with source-level permissions and a visible decision trail.",
     fullDetails: "Nightjar runs inside a customer-controlled environment. Every answer retains citations, source permissions and a review trail. The first wedge is legal and clinical operations where teams already spend hours reconstructing why a decision was made.\n\nSeven design partners are testing three workflows. Two have converted to paid pilots. The next milestone is a repeatable security package and deployment playbook.",
-    category: "AI", stage: "Prototype", createdAt: "2026-09-27T08:30:00.000Z", signal: 91, disclosure: "tiered",
+    category: "AI", stage: "Prototype", createdAt: "2026-09-27T08:30:00.000Z", signal: 91, disclosure: "tiered", accessMode: "trust", trustThreshold: 85,
     tags: ["AI", "Privacy", "Enterprise"], asks: ["Security engineer", "Compliance design partner"],
     validation: [{ label: "Partners", value: "7", detail: "2 paid pilots" }, { label: "Weekly tests", value: "126", detail: "Across 31 users" }, { label: "Time saved", value: "6.4h", detail: "Per user / week" }],
     likes: 186, dislikes: 6, interested: 39, commentsCount: 18,
     media: [{ id: "media-nightjar-1", kind: "image", name: "Private workspace concept", url: "/media/nightjar.svg", visibility: "public" }, { id: "media-nightjar-2", kind: "image", name: "Security architecture", url: "/media/private-blueprint.svg", visibility: "private" }],
+    sections: [
+      { id: "nightjar-public", label: "Public thesis", title: "The question is often more sensitive than the answer", body: "Regulated teams cannot paste live cases into a public AI product. Nightjar gives them a private workspace where source permissions survive every search, draft and review.", access: "public" },
+      { id: "nightjar-build-1", label: "Builder kit", title: "The first three workflows", body: "The first release focuses on evidence review, policy comparison and decision-draft preparation. Every generated statement links to an allowed source and retains reviewer history.", access: "build", bullets: ["Customer-controlled deployment", "Document-level permission inheritance", "Cited answers with review state", "Exportable decision trail"] },
+      { id: "nightjar-build-2", label: "Validation", title: "What the pilots already proved", body: "Seven design partners are testing the workflow with 31 weekly users. Two converted to paid pilots after teams saved an average of 6.4 hours per person each week.", access: "build" },
+      { id: "nightjar-full-1", label: "Execution room", title: "Twelve-week product roadmap", body: "Weeks 1–3 harden permission ingestion. Weeks 4–7 package the legal and clinical templates. Weeks 8–10 complete the security evidence pack. Weeks 11–12 turn the best pilot into a repeatable deployment playbook.", access: "full" },
+      { id: "nightjar-full-2", label: "Commercial plan", title: "How Nightjar becomes a business", body: "Start with paid workflow pilots, convert them into annual workspace contracts and price by protected knowledge domain rather than token usage. The biggest risk is deployment friction, so the first technical hire must own repeatable customer environments.", access: "full", bullets: ["Pilot: $12k–$25k", "Annual workspace: $48k+", "Target buyer: legal or clinical operations lead", "Primary risk: security review cycle"] },
+    ],
   }),
   idea({
     id: "idea-civicsignal", creatorId: "u-sofia", title: "CivicSignal",
@@ -265,11 +295,16 @@ const ideas: Idea[] = [
     oneLiner: "Risk-aware credit context built from consented onchain behavior.",
     description: "A user-controlled proof that translates wallet history into understandable financial signals without publishing every transaction.",
     fullDetails: "Users select which accounts and time windows to prove. ChainCred produces narrow claims—income consistency, liquidity buffer or repayment history—using zero-knowledge proofs where appropriate.\n\nThe product is not a universal score. Every claim has a purpose, expiry and visible data boundary.",
-    category: "Fintech", stage: "Prototype", createdAt: "2026-09-22T18:40:00.000Z", signal: 86, disclosure: "tiered",
+    category: "Fintech", stage: "Prototype", createdAt: "2026-09-22T18:40:00.000Z", signal: 86, disclosure: "tiered", accessMode: "paid", trustThreshold: 90,
     tags: ["ZK", "Credit", "Privacy"], asks: ["ZK engineer", "Lending design partner"],
     validation: [{ label: "Wallets", value: "1.4k", detail: "Anonymized study" }, { label: "Lenders", value: "6", detail: "Discovery" }, { label: "Claims", value: "4", detail: "Prototype" }],
     likes: 176, dislikes: 18, interested: 45, commentsCount: 26,
     media: [{ id: "media-chaincred-1", kind: "image", name: "Private proof architecture", url: "/media/private-blueprint.svg", visibility: "private" }],
+    sections: [
+      { id: "chain-public", label: "Public thesis", title: "Prove a financial fact without exposing a financial life", body: "ChainCred converts consented wallet history into narrow, purpose-bound claims such as income consistency or liquidity buffer. It deliberately avoids creating one universal score.", access: "public" },
+      { id: "chain-build", label: "Builder kit", title: "The proof workflow", body: "A user selects accounts, a time window and the claim requested by a lender. The system computes the claim locally or through a privacy-preserving proof, then issues an expiring result with a visible data boundary.", access: "build", bullets: ["Four initial claim templates", "User-controlled account selection", "Purpose and expiry on every proof", "No raw wallet history in the lender view"] },
+      { id: "chain-full", label: "Execution room", title: "Pilot plan, economics and risks", body: "The first paid pilot targets under-collateralized working-capital products. Revenue comes from verification fees paid by lenders, with free proof storage for users. Key risks are false confidence, wallet clustering errors and regulatory interpretation; each must be tested before a consumer launch.", access: "full", bullets: ["Six lenders in discovery", "1,400-wallet anonymized study", "Security review before live lending", "User appeal path required"] },
+    ],
   }),
   idea({
     id: "idea-droproom", creatorId: "u-pixel", title: "DropRoom",
@@ -286,10 +321,15 @@ const ideas: Idea[] = [
     oneLiner: "Private AI inference that small professional teams can actually operate.",
     description: "A managed local model appliance for clinics, law firms and studios with simple updates, audit logs and predictable cost.",
     fullDetails: "LocalCompute bundles vetted models, a permission layer and remote health monitoring into one appliance. Sensitive inputs stay on site; administrators get a plain-language control panel.\n\nThe pilot target is teams with 20–100 staff that cannot hire an ML platform team.",
-    category: "AI", stage: "Concept", createdAt: "2026-09-20T09:40:00.000Z", signal: 81, disclosure: "tiered",
+    category: "AI", stage: "Concept", createdAt: "2026-09-20T09:40:00.000Z", signal: 81, disclosure: "tiered", accessMode: "hybrid", trustThreshold: 82,
     tags: ["Private AI", "Infrastructure", "Enterprise"], asks: ["Hardware partner", "Security reviewer"],
     validation: [{ label: "Interviews", value: "27", detail: "IT leads" }, { label: "Pilots", value: "3", detail: "Verbal yes" }, { label: "Target", value: "$499", detail: "Monthly" }],
     likes: 119, dislikes: 10, interested: 32, commentsCount: 14,
+    sections: [
+      { id: "local-public", label: "Public thesis", title: "Private AI should not require an internal platform team", body: "Small clinics, law firms and studios need local inference, but they cannot maintain models, permissions and audit infrastructure themselves.", access: "public" },
+      { id: "local-build", label: "Builder kit", title: "The appliance and service layer", body: "LocalCompute combines a managed inference box, approved model catalog, role-based access and remote health monitoring. Customer data stays on site while signed updates and operational metrics remain supportable.", access: "build", bullets: ["20–100 person teams", "Guided model updates", "Plain-language administrator controls", "Predictable monthly price"] },
+      { id: "local-full", label: "Execution room", title: "Pilot specification", body: "The first three pilots compare installation time, task latency and administrator confidence. A successful pilot installs in one day, supports two high-value workflows and runs for thirty days without specialist intervention. Hardware margin is secondary to the managed-service contract.", access: "full" },
+    ],
   }),
   idea({
     id: "idea-skillmint", creatorId: "u-nova", title: "SkillMint",
@@ -363,10 +403,42 @@ const ideas: Idea[] = [
     category: "Consumer", stage: "Concept", createdAt: "2026-09-26T17:05:00.000Z", postType: "post", signal: 73,
     tags: ["Pricing", "Question"], likes: 56, dislikes: 9, interested: 17, commentsCount: 29,
   }),
+  idea({
+    id: "article-idea-gap", creatorId: "u-maya", title: "Why good ideas die between the post and the project",
+    oneLiner: "The missing layer is not inspiration. It is a credible way for the right people to commit.",
+    description: "A useful idea can attract likes and still go nowhere. The hard part begins after discovery: explaining enough context, finding someone with complementary skill, agreeing on a first test and giving that work a place to live.",
+    fullDetails: "Social networks optimize for reaction. Project tools optimize for teams that already exist. Between them is an unowned moment: someone has a real problem, another person can build, but neither has a trusted way to move from interest to commitment.\n\nPassionHouse treats the idea as a living starting point. The creator can share it openly, reveal deeper material through trust or paid access, invite a builder into a scoped proposal and keep the resulting work connected to the original public story.\n\nThe goal is not to turn every thought into a startup. It is to make the promising ones easier to understand, support and test.",
+    category: "Future of work", stage: "Validated", createdAt: "2026-09-27T13:18:00.000Z", postType: "article", signal: 96,
+    tags: ["Ideas", "Collaboration", "Building"], asks: ["Builders who have rescued abandoned ideas"], likes: 312, dislikes: 7, interested: 68, commentsCount: 41,
+    readingTime: 7, tipsTotal: 860, tipCount: 34,
+    sections: [
+      { id: "article-gap-1", label: "The gap", title: "Attention is not commitment", body: "An idea post can collect reactions while the creator remains alone. Likes do not reveal who can design the prototype, introduce the pilot customer or commit two weekends to a test. The platform must make those next actions visible without making publication feel like a grant application.", access: "public" },
+      { id: "article-gap-2", label: "The bridge", title: "Let ideas become working rooms", body: "A reader should move naturally from understanding the idea to tipping it, following progress, offering a skill, requesting the builder kit or backing a milestone. Each action adds useful signal instead of another vanity metric.", access: "public", bullets: ["Read the complete thinking", "Support with a tip", "Offer a useful contribution", "Fund one clear milestone"] },
+      { id: "article-gap-3", label: "The principle", title: "Keep the creator in control", body: "Public-by-default sharing creates discovery. Trust and paid access protect deeper execution material. Clear proposals protect ownership. The creator chooses the boundary while builders get enough context to decide whether they can genuinely help.", access: "public" },
+    ],
+  }),
+  idea({
+    id: "article-trust-access", creatorId: "u-idris", title: "Trust can be a better access key than another subscription",
+    oneLiner: "Strong collaborators should sometimes unlock a project with proof of work, not a card.",
+    description: "Paid access is useful when the material itself has value. But an experienced engineer, researcher or operator may create more value than the price of admission.",
+    fullDetails: "Trust-based access lets a creator set a credibility threshold and reveal the builder kit to people who meet it. Hybrid access gives everyone else a paid path instead of creating a closed circle.\n\nThe important part is transparency: people should know why they qualify, what they unlock and what remains protected.",
+    category: "Future of work", stage: "Concept", createdAt: "2026-09-26T22:10:00.000Z", postType: "article", signal: 87,
+    tags: ["Trust", "Access", "Reputation"], likes: 171, dislikes: 13, interested: 44, commentsCount: 28,
+    readingTime: 5, tipsTotal: 370, tipCount: 19,
+  }),
+  idea({
+    id: "article-public-private", creatorId: "u-aisha", title: "Build in public without publishing your entire playbook",
+    oneLiner: "Share the problem and progress widely; protect only what truly needs a boundary.",
+    description: "Creators often choose between oversharing and disappearing into stealth. A layered idea can keep the conversation public while protecting customer lists, security details or commercial execution notes.",
+    fullDetails: "The public layer should explain the problem, insight and direction well enough to earn thoughtful feedback. The builder layer can contain workflows, requirements and validation. The execution layer can hold sensitive assets and commercial detail.\n\nThis is not secrecy for its own sake. It is a legible boundary that helps readers understand how to earn or purchase deeper access.",
+    category: "Web3", stage: "Prototype", createdAt: "2026-09-25T20:30:00.000Z", postType: "article", signal: 84,
+    tags: ["Build in public", "Privacy", "Creators"], likes: 149, dislikes: 8, interested: 39, commentsCount: 20,
+    readingTime: 6, tipsTotal: 295, tipCount: 16,
+  }),
 ];
 
 export const demoState: PassionHouseState = {
-  schemaVersion: 3,
+  schemaVersion: 4,
   currentUserId: null,
   users,
   ideas,
@@ -395,11 +467,17 @@ export const demoState: PassionHouseState = {
     },
   ],
   fundingRequests: [
-    { id: "fund-1", ideaId: "idea-agentcommons", userId: "u-nova", audience: "both", amount: "$250,000", summary: "Fund an 18-month protocol and community pilot runway.", useOfFunds: "Protocol engineering, audits and five community pilots.", status: "under-review", createdAt: "2026-09-26T14:00:00.000Z" },
-    { id: "fund-2", ideaId: "idea-loopline", userId: "u-maya", audience: "investors", amount: "$180,000", summary: "Launch the first dense city cluster with twelve brands.", useOfFunds: "Operator tooling, local inspection network and pilot logistics.", status: "open", createdAt: "2026-09-25T12:00:00.000Z" },
-    { id: "fund-3", ideaId: "idea-droproom", userId: "u-pixel", audience: "passionhouse", amount: "$50,000", summary: "Run ten artist-led collaborative drop rooms.", useOfFunds: "Realtime prototype, creator grants and collector research.", status: "under-review", createdAt: "2026-09-24T10:00:00.000Z" },
-    { id: "fund-4", ideaId: "idea-kite", userId: "u-ren", audience: "investors", amount: "$400,000", summary: "Move from beta to regulated production pilots.", useOfFunds: "Compliance, banking integrations and engineering.", status: "open", createdAt: "2026-09-23T10:00:00.000Z" },
-    { id: "fund-5", ideaId: "idea-skillmint", userId: "u-nova", audience: "both", amount: "$120,000", summary: "Fund three proof-of-work learning cohorts.", useOfFunds: "Learner bounties, expert reviewers and platform operations.", status: "funded", createdAt: "2026-09-20T10:00:00.000Z" },
+    { id: "fund-1", ideaId: "idea-agentcommons", userId: "u-nova", audience: "both", amount: "$250,000", summary: "Fund an 18-month protocol and community pilot runway.", useOfFunds: "Protocol engineering, audits and five community pilots.", fundingType: "investment", proof: "32 test agents and five design-partner communities.", timeline: "18 months", raisedAmount: 72000, backerCount: 21, status: "under-review", createdAt: "2026-09-26T14:00:00.000Z" },
+    { id: "fund-2", ideaId: "idea-loopline", userId: "u-maya", audience: "community", amount: "$18,000", summary: "Put the first twelve-brand city pilot on the road.", useOfFunds: "Operator tooling, local inspections and the first 500 pooled returns.", fundingType: "milestone", proof: "12 signed pilot letters and 84 customer/operator interviews.", timeline: "10 weeks", raisedAmount: 11640, backerCount: 74, status: "open", createdAt: "2026-09-25T12:00:00.000Z" },
+    { id: "fund-3", ideaId: "idea-droproom", userId: "u-pixel", audience: "passionhouse", amount: "$50,000", summary: "Run ten artist-led collaborative drop rooms.", useOfFunds: "Realtime prototype, creator grants and collector research.", fundingType: "grant", proof: "240 collectors joined an invite-only creative test.", timeline: "6 months", raisedAmount: 10000, backerCount: 12, status: "under-review", createdAt: "2026-09-24T10:00:00.000Z" },
+    { id: "fund-4", ideaId: "idea-kite", userId: "u-ren", audience: "investors", amount: "$400,000", summary: "Move from beta to regulated production pilots.", useOfFunds: "Compliance, banking integrations and engineering.", fundingType: "investment", proof: "Three pilot partners and a functioning risk prototype.", timeline: "14 months", raisedAmount: 85000, backerCount: 8, status: "open", createdAt: "2026-09-23T10:00:00.000Z" },
+    { id: "fund-5", ideaId: "idea-skillmint", userId: "u-nova", audience: "both", amount: "$120,000", summary: "Fund three proof-of-work learning cohorts.", useOfFunds: "Learner bounties, expert reviewers and platform operations.", fundingType: "grant", proof: "A 96-person pilot cohort completed useful sponsor work.", timeline: "9 months", raisedAmount: 120000, backerCount: 46, status: "funded", createdAt: "2026-09-20T10:00:00.000Z" },
+  ],
+  tips: [
+    { id: "tip-1", fromUserId: "u-idris", toUserId: "u-maya", ideaId: "idea-loopline", amount: 25, note: "The pooled returns insight is worth testing.", kind: "tip", createdAt: "2026-09-27T12:10:00.000Z" },
+    { id: "tip-2", fromUserId: "u-byte", toUserId: "u-aisha", ideaId: "post-aisha-wallets", amount: 10, note: "More calm wallet thinking, please.", kind: "tip", createdAt: "2026-09-27T11:30:00.000Z" },
+    { id: "tip-3", fromUserId: "u-sofia", toUserId: "u-maya", ideaId: "article-idea-gap", amount: 50, note: "This names the missing layer clearly.", kind: "tip", createdAt: "2026-09-27T13:40:00.000Z" },
+    { id: "tip-4", fromUserId: "u-nova", toUserId: "u-pixel", ideaId: "idea-droproom", amount: 100, note: "Backing the first artist room.", kind: "backing", createdAt: "2026-09-26T16:15:00.000Z" },
   ],
   reactions: { "idea-nightjar:u-maya": "like", "post-aisha-wallets:u-maya": "like" },
   interests: ["idea-nightjar:u-maya", "idea-agentcommons:u-maya"],
