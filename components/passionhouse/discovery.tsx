@@ -282,13 +282,13 @@ export function IdeaDetailSheet({
 
   return (
     <Dialog open={!!idea} onOpenChange={onOpenChange}>
-      <DialogContent showCloseButton={false} className="ph-reader-dialog">
+      <DialogContent showCloseButton={false} fullScreen className="ph-reader-dialog">
         <header className="ph-reader-topbar">
           <button type="button" className="ph-reader-brand" onClick={() => onOpenChange(false)}><span>PH</span><strong>PassionHouse</strong></button>
           <div className="ph-reader-progress"><span style={{ width: idea.progress + "%" }} /></div>
           <div className="flex items-center gap-2">
-            <Button type="button" variant="ghost" size="sm" onClick={() => onTip(idea.id, creator.id)} className="text-white/60 hover:bg-white/10 hover:text-white"><Coffee />Tip</Button>
-            <Button type="button" variant="ghost" size="icon-sm" onClick={() => onOpenChange(false)} className="text-white/55 hover:bg-white/10 hover:text-white" aria-label="Close reader"><X /></Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => onTip(idea.id, creator.id)} className="ph-reader-btn-tip text-white/60 hover:bg-white/10 hover:text-white"><Coffee />Tip</Button>
+            <Button type="button" variant="ghost" size="icon-sm" onClick={() => onOpenChange(false)} className="ph-reader-btn-close text-white/55 hover:bg-white/10 hover:text-white" aria-label="Close reader"><X /></Button>
           </div>
         </header>
 

@@ -204,32 +204,21 @@ export function CompactEmpty({ icon: Icon, title }: { icon: React.ElementType; t
 }
 
 export function AmbientCursor() {
-  const dotRef = React.useRef<HTMLSpanElement>(null);
-  const ringRef = React.useRef<HTMLSpanElement>(null);
   const progressRef = React.useRef<HTMLSpanElement>(null);
 
   React.useEffect(() => {
-    if (!window.matchMedia("(pointer: fine)").matches) return;
-    document.documentElement.classList.add("ph-has-cursor");
-    const move = (event: PointerEvent) => {
-      dotRef.current?.style.setProperty("transform", `translate3d(${event.clientX}px, ${event.clientY}px, 0)`);
-      ringRef.current?.style.setProperty("transform", `translate3d(${event.clientX}px, ${event.clientY}px, 0)`);
-    };
     const scroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       progressRef.current?.style.setProperty("transform", `scaleX(${max > 0 ? window.scrollY / max : 0})`);
     };
-    window.addEventListener("pointermove", move, { passive: true });
     window.addEventListener("scroll", scroll, { passive: true });
     scroll();
     return () => {
-      document.documentElement.classList.remove("ph-has-cursor");
-      window.removeEventListener("pointermove", move);
       window.removeEventListener("scroll", scroll);
     };
   }, []);
 
-  return <><span ref={progressRef} className="ph-scroll-progress" /><span ref={ringRef} className="ph-cursor-ring" /><span ref={dotRef} className="ph-cursor-dot" /></>;
+  return <span ref={progressRef} className="ph-scroll-progress" />;
 }
 
 export function FloatingPostButton({ onClick }: { onClick: () => void }) {
