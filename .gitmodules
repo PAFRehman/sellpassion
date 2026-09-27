@@ -1,0 +1,6 @@
+[submodule "Downloads/monstack/contracts/lib/openzeppelin-contracts"]
+	path = Downloads/monstack/contracts/lib/openzeppelin-contracts
+	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "Downloads/monstack/contracts/lib/forge-std"]
+	path = Downloads/monstack/contracts/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std

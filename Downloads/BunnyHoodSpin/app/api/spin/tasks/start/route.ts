@@ -1,0 +1,20 @@
+import { requireSessionUser } from "@/lib/spin/auth";
+import { startCampaignTask, type TaskType } from "@/lib/spin/campaigns";
+import { assertSameOrigin, HttpError, json, readJson, routeError } from "@/lib/spin/http";
+
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+
+export async function POST(request: Request) {
+  try {
+    assertSameOrigin(request);
+    const user = await requireSessionUser(request, true);
+    const body = await readJson<{ task?: string }>(request);
+    if (!body.task || !["like", "repost", "comment"].includes(body.task)) {
+      throw new HttpError(400, "Choose a valid campaign task.", "BAD_TASK");
+    }
+    return json(await startCampaignTask(user, body.task as TaskType));
+  } catch (error) {
+    return routeError(error);
+  }
+}
