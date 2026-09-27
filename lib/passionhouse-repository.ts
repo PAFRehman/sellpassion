@@ -7,18 +7,19 @@ export interface PassionHouseRepository {
   reset(): PassionHouseState;
 }
 
-const STORAGE_KEY = "passionhouse.mvp.state.v2";
+const STORAGE_KEY = "passionhouse.mvp.state.v3";
 
 function isPassionHouseState(value: unknown): value is PassionHouseState {
   if (!value || typeof value !== "object") return false;
   const state = value as Partial<PassionHouseState>;
   return (
-    state.schemaVersion === 2 &&
+    state.schemaVersion === 3 &&
     Array.isArray(state.users) &&
     Array.isArray(state.ideas) &&
     Array.isArray(state.accessRequests) &&
     Array.isArray(state.proposals) &&
-    Array.isArray(state.dealRooms)
+    Array.isArray(state.dealRooms) &&
+    Array.isArray(state.fundingRequests)
   );
 }
 

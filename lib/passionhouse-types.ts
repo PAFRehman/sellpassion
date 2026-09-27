@@ -1,4 +1,4 @@
-export type ViewKey = "discover" | "people" | "requests" | "proposals" | "deals" | "profile";
+export type ViewKey = "discover" | "funding" | "people" | "requests" | "proposals" | "deals" | "profile";
 
 export type AccessTier = "context" | "build" | "full";
 
@@ -31,6 +31,8 @@ export type UserProfile = {
   location: string;
   skills: string[];
   avatarTone: string;
+  avatarUrl?: string;
+  identityStyle?: "person" | "nft";
   credibility: number;
   credibilityBreakdown: CredibilityBreakdown;
   verifications: string[];
@@ -62,6 +64,9 @@ export type Idea = {
   title: string;
   oneLiner: string;
   description: string;
+  fullDetails: string;
+  postType: "idea" | "post";
+  disclosure: "open" | "tiered";
   category: string;
   stage: string;
   createdAt: string;
@@ -80,6 +85,26 @@ export type Idea = {
     build: string;
     full: string;
   };
+  accessPricing: {
+    currency: "USD";
+    context: number;
+    build: number;
+    full: number;
+  };
+};
+
+export type FundingAudience = "investors" | "passionhouse" | "both";
+
+export type FundingRequest = {
+  id: string;
+  ideaId: string;
+  userId: string;
+  audience: FundingAudience;
+  amount: string;
+  summary: string;
+  useOfFunds: string;
+  status: "open" | "under-review" | "funded";
+  createdAt: string;
 };
 
 export type Comment = {
@@ -99,6 +124,8 @@ export type AccessRequest = {
   role: string;
   note: string;
   status: "pending" | "approved" | "declined";
+  accessMethod?: "request" | "paid";
+  amountPaid?: string;
   createdAt: string;
 };
 
@@ -162,7 +189,7 @@ export type LocalAccount = {
 };
 
 export type PassionHouseState = {
-  schemaVersion: 2;
+  schemaVersion: 3;
   currentUserId: string | null;
   users: UserProfile[];
   ideas: Idea[];
@@ -170,6 +197,7 @@ export type PassionHouseState = {
   accessRequests: AccessRequest[];
   proposals: Proposal[];
   dealRooms: DealRoom[];
+  fundingRequests: FundingRequest[];
   reactions: Record<string, "like" | "dislike">;
   interests: string[];
   localAccounts: LocalAccount[];

@@ -1,328 +1,189 @@
 # PassionHouse
 
-> The public idea network where credible people find each other and turn conviction into execution.
+**The public network where thoughts become teams, funding and real projects.**
 
-PassionHouse is a polished, local-first MVP for publishing serious ideas, discovering the people who can move them forward, controlling sensitive disclosure, agreeing on a collaboration, and doing the work in one place.
+PassionHouse combines an X-style idea feed, credible social identity, controlled project access, funding discovery and private execution. A user can share one casual sentence or publish a complete venture thesis, then find the people and capital needed to move it forward.
 
-It combines the openness of a social feed with the trust and structure missing from most social platforms. Ideas begin in public. Identity and proof make the people around them legible. Sensitive material stays creator-controlled. When the fit is real, the conversation becomes a proposal and then a private deal room.
+The platform takes **0% equity**.
 
-**The platform takes 0% equity.**
+## Why it exists
 
-## Why PassionHouse exists
+The internet has many places to post and many tools to manage established teams, but very little infrastructure between those moments. Promising ideas lose momentum because:
 
-Good ideas rarely fail because nobody can write a pitch deck. They fail in the space between posting and execution:
+- useful thoughts are buried by attention-driven feeds;
+- creators cannot quickly distinguish credible collaborators from noise;
+- sensitive plans are either exposed too early or hidden too completely;
+- funding requests are detached from visible proof and community response;
+- replies, DMs, proposals, terms and delivery live in separate tools.
 
-- The right builder never sees the idea.
-- A founder cannot tell a credible collaborator from a loud stranger.
-- Creators either reveal too much publicly or share too little to earn interest.
-- Useful conversations disappear across replies, DMs, documents, and calls.
-- A promising connection has no natural path into scope, terms, milestones, and delivery.
+PassionHouse creates one continuous path:
 
-Existing networks optimize for attention. Talent marketplaces optimize for transactions. Project tools begin after a team already exists. PassionHouse connects those stages into one trust-aware system.
+**Post → signal → trust → access → funding/proposal → deal room → delivery**
 
-## The product thesis
+## What this MVP includes
 
-An idea should be able to move through a continuous path:
+### A social feed for ideas of every size
 
-```mermaid
-flowchart LR
-    A[Public idea] --> B[Community signal]
-    B --> C[Credible people]
-    C --> D[Earned access]
-    D --> E[Proposal]
-    E --> F[Private deal room]
-    F --> G[Milestones and delivery]
-```
+- Quick posts for questions, updates, observations and casual asks
+- Full ideas with overview, complete plan, proof, media and collaborators needed
+- “For you,” Ideas, Quick posts and Latest feed channels
+- Search, sector/stage filters and signal-based ranking
+- Likes, dislikes, comments and builder-interest signals
+- Image and video uploads in the browser demo
+- Floating `+` composer available while scrolling
 
-The public layer creates discovery. The identity layer creates confidence. The disclosure layer protects creators. The execution layer prevents momentum from leaking into a dozen disconnected tools.
+All content is public by default. A full idea can be completely open or use a public preview with protected project material.
 
-## What makes it different
+### Tiered and paid project access
 
-### Ideas are posts, not listings
+Each full idea supports three plans:
 
-Discover is designed as a living feed rather than a marketplace grid. A creator can publish a full thesis, not just a title and a category. Each post can contain:
+1. **Context** — public research and problem framing; free
+2. **Build Plan** — workflow, validation and build priorities; demo price `$19`
+3. **Full Project** — commercial plan, private media and execution material; demo price `$49`
 
-- Up to 10,000 characters of long-form thinking
-- A clear one-line thesis
-- Stage, sector, evidence, and current ask
-- Images and video
-- Validation metrics
-- Comments, useful votes, and builder interest
-- A public signal score
+Two access paths are demonstrated:
 
-Every idea is public by design. This keeps the network discoverable and prevents a feed full of empty, locked cards.
+- **Request access:** creator-review flow that auto-approves Full Project access in the MVP.
+- **Instant access:** tier selection, order summary, simulated card checkout and immediate unlock.
 
-### Privacy lives at the material level
+No real payment is processed. Pricing is seeded only to demonstrate the product and upgrade flow.
 
-Creators do not have to choose between exposing everything and hiding the entire opportunity. Every uploaded image or video can be marked separately as:
+### Funding before or after collaboration
 
-- **Public** — visible directly in the Discover feed
-- **Private** — visible only to the creator and people whose access request has been approved
+Creators can pitch:
 
-The public thesis attracts the right people. Sensitive diagrams, financial material, partner information, and execution details can remain protected.
+- verified investors;
+- the PassionHouse project fund;
+- or both audiences together.
 
-### Disclosure is earned in layers
+A funding pitch records the amount, milestone, use of funds and review status. The Funding channel shows open opportunities, creator submissions, funded examples and investor-interest signals.
 
-An interested builder can request one of three levels:
+### Trust-aware people discovery
 
-1. **Context** — problem framing and non-sensitive research
-2. **Build brief** — workflow, requirements, and deeper validation
-3. **Full room** — commercial detail, private materials, and execution plan
+- Demo X sign-in and persona switching
+- Searchable people, skills, roles and social handles
+- Human and NFT/Web3-style identities
+- Connected X, LinkedIn, GitHub, Instagram and website profiles
+- Credibility based on identity, execution, community and responsiveness
+- Direct social/contact routes from public profiles
 
-The creator reviews the requester’s profile, social proof, platform behavior, and reason for asking. They can approve the requested tier, grant a smaller tier, or decline.
+### Collaboration and execution
 
-### Credibility is more than followers
+- Structured contribution proposals
+- Scope, timeline, budget and outcome terms
+- Proposal acceptance that opens a private deal room
+- Chat, milestones, documents and agreement summary
+- Explicit ownership language and 0% platform equity
 
-PassionHouse treats identity as a blend of external proof and behavior. The demo score combines:
+## Demo data
 
-- Connected social identity
-- Audience size and recent growth
-- Execution history
-- Community trust
-- Responsiveness
-- Completed projects and collaborations
-- References and other verified signals
+The seed includes 20 full ideas and quick posts across AI, Web3, climate, health, fintech, civic technology, creator economy, education and the future of work. It also includes ten varied profiles, funding pitches, access records, proposals, comments and an active deal room.
 
-Users can connect X, LinkedIn, GitHub, Instagram, and a personal website. Connecting another account updates the credibility model in the demo. Follower count contributes context, but it never determines trust by itself.
+Suggested walkthrough:
 
-### People are searchable and reachable
+1. Continue with X as Maya Chen or choose a Web3 persona.
+2. Switch between Ideas and Quick posts in Discover.
+3. Open a fully public idea and a protected-preview idea.
+4. Choose **Request access** to test automatic MVP approval.
+5. Reopen access and test the paid Build Plan or Full Project checkout.
+6. Open Funding, inspect opportunities and submit a creator pitch.
+7. Search people and inspect connected socials and credibility.
+8. Review proposals and use the active Nightjar deal room.
+9. Use the floating `+` button to publish a quick post or complete idea.
 
-The People graph can be searched by:
+## Design
 
-- Name or `@handle`
-- Role or location
-- Skill
-- What the person is open to
-- Connected social handle
+The interface carries the HoodX visual language into a friendlier product system:
 
-Public profiles show credibility, its breakdown, work history, public ideas, connected accounts, follower and growth signals, availability, and direct contact routes.
+- black and graphite foundation with restrained blue/pink signal accents;
+- star field, orbital lines, binary fragments and meteor motion;
+- lightweight glass surfaces and high-contrast actions;
+- custom cursor, scroll progress and reduced-motion support;
+- responsive feed, sheets, dialogs and mobile navigation;
+- illustrated human and Web3/NFT profile avatars.
 
-### Collaboration becomes execution
-
-After access is approved, a builder can submit a structured proposal with:
-
-- Outcome
-- Summary
-- Scope
-- Timeline
-- Budget
-
-Accepting the proposal opens a private deal room containing:
-
-- Participant chat
-- Agreed terms
-- Milestones and progress
-- Documents
-- Ownership language
-- A clear reminder that PassionHouse takes no equity
-
-## MVP experience
-
-### 1. Enter with X
-
-The onboarding screen simulates an X OAuth flow. The user can continue with the featured identity or select another demo X persona.
-
-This is intentionally a safe demo: no request is sent to X, no real token is created, and no external account is modified.
-
-### 2. Discover ideas
-
-The feed supports:
-
-- “For you” and “Latest” views
-- Search across ideas, long-form content, creators, and handles
-- Sector and stage filters
-- Sorting by signal, recency, or interest
-- Public and locked media previews
-- Likes, dislikes, comments, and interest
-
-### 3. Explore people
-
-Search the builder graph, inspect trust signals, open public profiles, and follow connected social links to make contact.
-
-### 4. Publish
-
-The two-step composer collects the public thesis first and collaboration evidence second. Images and videos can be uploaded from the device and individually marked public or private.
-
-### 5. Control access
-
-Creators receive structured access requests and can decide exactly how much to reveal.
-
-### 6. Propose and build
-
-Approved collaborators submit terms. Accepted proposals create deal rooms where the relationship becomes measurable work.
-
-## Investor-demo scenarios
-
-The seeded data supports a complete walkthrough:
-
-1. Continue with X as Maya Chen.
-2. Browse the public idea feed.
-3. Open Loopline to inspect its long thesis and public/private media model.
-4. Open another creator’s public profile and inspect connected accounts.
-5. Visit Maya’s profile and connect GitHub to see credibility change.
-6. Review incoming access requests for Loopline.
-7. Grant a smaller or equal disclosure tier.
-8. Review structured proposals.
-9. Accept a proposal to create a deal room.
-10. Send a message, complete a milestone, and attach a document.
-11. Publish a new public idea with an image or video.
-
-## Design language
-
-The interface adapts the design language developed for HoodX:
-
-- Pure black foundation
-- Monochrome white/graphite hierarchy
-- Arial/Helvetica display typography
-- Monospaced system metadata
-- Star-field texture, orbital lines, binary fragments, and quiet meteor motion
-- Minimal borders and glass-like black surfaces
-- High-contrast actions with almost no decorative color
-
-The result is intentionally closer to a private signal terminal than a conventional startup marketplace.
-
-## Technology
+## Stack
 
 - Next.js 15 App Router
-- React 19
-- TypeScript in strict mode
+- React 19 + strict TypeScript
 - Tailwind CSS 4
-- Radix/shadcn UI primitives
-- Lucide icons
-- Sonner notifications
-- Browser local storage repository
+- Radix/shadcn primitives
+- Lucide icons + Sonner notifications
+- Versioned browser-local repository
 
-## Architecture
+## Project structure
 
 ```text
-app/
-  layout.tsx                       Metadata and root shell
-  page.tsx                         PassionHouse entry page
-  globals.css                      HoodX-inspired design system
-components/
-  passionhouse-app.tsx             Product flows and interactive UI
-  ui/                              Reusable interface primitives
+app/                               route, metadata and global design system
+components/passionhouse-shell.tsx  application state and flow orchestration
+components/passionhouse/
+  discovery.tsx                    feed, posts and idea detail
+  composer-dialogs.tsx             quick/full composer and access checkout
+  funding.tsx                      funding channel and pitch flow
+  collaboration-views.tsx          requests, proposals and deal rooms
+  people-views.tsx                 people, profiles and demo auth
+  passionhouse-ui.tsx              shared product primitives
 lib/
-  passionhouse-types.ts            Domain model
-  passionhouse-demo.ts             Seeded people, ideas and deal data
-  passionhouse-repository.ts       Replaceable local repository adapter
-  utils.ts                         Shared utilities
-public/
-  media/                            Project-owned demo media
+  passionhouse-types.ts            typed domain model
+  passionhouse-demo.ts             compact seeded MVP data
+  passionhouse-repository.ts       replaceable local persistence adapter
+public/avatars/                    original illustrated profile art
+public/media/                      project demo media
 ```
 
-The application is deliberately separated into a typed domain state and a repository adapter. UI actions do not call `localStorage` directly. Replacing the demo layer with Supabase, Postgres, or another backend can happen behind the repository/API boundary without redesigning the product model.
-
-## Local data model
-
-The MVP persists these entities:
-
-- User profiles and connected socials
-- Public ideas and media visibility
-- Comments and reactions
-- Interest signals
-- Access requests and granted tiers
-- Proposals
-- Deal rooms, messages, milestones, and documents
-- Local demo accounts
-
-The schema is versioned. Incompatible old demo state is safely replaced with fresh seed data.
+The UI never writes to `localStorage` directly. The repository adapter can later be replaced by Supabase/Postgres and server APIs without rewriting the product views.
 
 ## Run locally
 
-### Requirements
-
-- Node.js 20 or newer
-- npm
-
-### Install
+Requirements: Node.js 20+ and npm.
 
 ```bash
 npm ci
-```
-
-### Start development
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open `http://localhost:3000`.
 
-### Validate
-
-```bash
-npx tsc --noEmit
-npx eslint components/passionhouse-app.tsx lib app
-npm run build
-```
-
-### Production
+Validate the complete project:
 
 ```bash
-npm run build
-npm start
+npm run check
 ```
 
 ## Deploy to Vercel
 
-1. Push this repository to GitHub.
-2. Import the repository in Vercel.
-3. Keep the detected framework as Next.js.
-4. Deploy; the MVP does not require environment variables.
+1. Push the repository to GitHub.
+2. Import it into Vercel with the **Next.js** framework preset.
+3. Keep Root Directory at the repository root.
+4. Leave Build Command and Install Command overrides disabled.
+5. Deploy. No environment variables are required for this MVP.
+
+The included `vercel.json` pins the Next.js preset and clears any stale custom Output Directory. This prevents the previous `No Output Directory named "output"` failure. If the dashboard still shows an Output Directory override, switch it off and redeploy without the build cache.
 
 ## Demo boundaries
 
-This repository is an investor-demo-ready MVP, not a production authentication or file-storage system.
-
-- X OAuth is simulated.
-- Social metrics are seeded demo data.
-- Uploaded media is encoded locally for the active browser; the composer limits upload batches to keep the demo reliable.
-- Password-based local demo accounts use client-side hashing and are not production authentication.
+- X OAuth, social metrics, investor interest and payments are simulated.
+- Uploaded media is stored as local browser data and should remain small.
+- Local passwords are demo-only client-side hashes, not production authentication.
 - Deal-room documents store metadata only.
-- There is no server authorization layer yet.
-- External social links are illustrative demo destinations.
+- There is no server authorization, object storage, payment settlement or escrow yet.
+- Do not use real secrets, financial details or confidential project files.
 
-Do not store secrets or sensitive real-world deal material in the local MVP.
+## Production path
 
-## Production roadmap
+1. Real X OAuth and verified social connections
+2. Postgres/Supabase, object storage and server-enforced tier permissions
+3. Creator-defined pricing, Stripe/crypto checkout and revenue settlement
+4. Transparent credibility, anti-gaming and verified work outcomes
+5. Semantic matching, notifications and personalized feeds
+6. E-signatures, escrow, milestone approvals and durable deal-room chat
 
-### Phase 1 — real identity and durable data
+## The long-term opportunity
 
-- X OAuth 2.0 / OpenID Connect
-- Supabase or Postgres
-- Object storage with signed URLs
-- Server-side authorization for disclosure tiers
-- Profile editing and social account verification
-- Full-text and semantic search
+PassionHouse is not merely another place to post startup concepts. It can become the coordination layer between public intent and committed work.
 
-### Phase 2 — trust and matching
-
-- Transparent credibility calculation
-- Anti-gaming and account-quality checks
-- Reference requests and verified project outcomes
-- Skill and opportunity matching
-- Personalized feed ranking
-- Notifications and saved searches
-
-### Phase 3 — execution infrastructure
-
-- Real-time deal-room chat
-- Versioned agreements
-- E-signatures
-- Milestone approvals
-- Payments or escrow integrations
-- Project outcome proofs that feed back into credibility
-
-## Why it could be revolutionary
-
-PassionHouse can become a missing coordination layer for the internet’s builders.
-
-Social platforms are excellent at revealing interest but weak at establishing fit. Professional networks expose résumés but rarely show present intent. Freelance marketplaces commoditize people into bids. Project software assumes the team is already formed.
-
-PassionHouse begins one step earlier—with the idea—and carries the relationship through trust, disclosure, agreement, and execution. If that loop works, every completed collaboration makes the network more useful: ideas gain evidence, people gain portable proof, and future teams can form with less uncertainty.
-
-The long-term opportunity is not another place to post startup ideas. It is an operating system for turning credible public intent into real shared work.
+Every successful project improves the network: ideas gain evidence, people gain portable proof, investors see momentum in context, and future teams form with less uncertainty. If PassionHouse closes that loop, an ordinary post can become a trusted collaboration without losing its energy—or its creator—between disconnected platforms.
 
 ## License
 
